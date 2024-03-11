@@ -1,0 +1,70 @@
+set ideajoin
+set idearefactormode=select
+set highlightedyank
+set incsearch
+set NERDTree
+set surround
+set commentary
+set ignorecase smartcase
+set visualbell
+set number relativenumber
+set ideajoin
+set hls
+
+""" Editing and Reloading the Config
+set clipboard+=unnamed
+set clipboard+=ideaput
+nnoremap \e :e ~/.ideavimrc<CR>
+nnoremap <leader>si :source ~/.ideavimrc<CR>
+
+""" Terminal
+nnoremap <leader>t :action ActivateTerminalToolWindow<CR>
+
+""" Navigation
+nnoremap <c-\> :action SplitVertically<CR>
+nnoremap <c--> :action SplitHorizontally<CR>
+nnoremap <c-=> :action Unsplit<CR>
+nnoremap <c-m> :action MoveEditorToOppositeTabGroup<CR>
+nnoremap <TAB> :action PreviousTab<CR>
+nnoremap <s-TAB> :action NextTab<CR>
+
+""" Editing source code
+vnoremap < <gv
+vnoremap > >gv
+nnoremap <leader>r :action Refactorings.QuickListPopupAction<CR>
+vnoremap <leader>r :action Refactorings.QuickListPopupAction<CR>
+nnoremap <leader>f :action ReformatCode<CR>
+nnoremap <leader>o :action OptimizeImports<CR>
+nnoremap <leader>l :action RecentLocations<CR>
+nnoremap <leader>e :action ShowErrorDescription<CR>
+nnoremap <leader>d :action QuickJavaDoc<CR>
+nnoremap <c-r> :action RecentFiles<CR>
+nnoremap ge :action GotoNextError<CR>
+nnoremap gE :action GotoPreviousError<CR>
+
+""" Searching and Source Code Navigation
+nnoremap <c-/> :action FindInPath<CR>
+nnoremap <c-a> :action GotoAction<CR>
+nnoremap <c-f> :action GotoFile<CR>
+nnoremap <c-s> :action FileStructurePopup<CR>
+nnoremap <c-o> :action GotoSymbol<CR>
+inoremap <c-/> <C-o>:action FindInPath<CR>
+inoremap <c-a> <C-o>:action GotoAction<CR>
+inoremap <c-f> <C-o>:action GotoFile<CR>
+inoremap <c-s> <C-o>:action FileStructurePopup<CR>
+inoremap <c-o> <C-o>:action GotoSymbol<CR>
+nnoremap <leader>u :action FindUsages<CR>
+nnoremap <leader>sy :action GotoSymbol<CR>
+nnoremap gi :action GotoImplementation<CR>
+nnoremap gd :action GotoDeclaration<CR>
+nnoremap gt :action QuickImplementations<CR>
+
+""" Tool windows
+nnoremap <c-p> :action JumpToLastWindow<CR>
+nnoremap <c-x> :action HideAllWindows<CR>
+nnoremap <leader>n :action NewElementSamePlace<CR>
+
+" Useful Git actions
+nnoremap <leader>gb :action Git.Branches<cr>
+nnoremap <leader>gp :action Git.Pull<cr>
+nnoremap <leader>gm :action Git.Menu<cr>
