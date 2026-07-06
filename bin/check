@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+info() {
+  printf "[check] %s\n" "$1"
+}
+
+warn() {
+  printf "[check] warning: %s\n" "$1" >&2
+}
+
+info "checking bash syntax"
+bash -n "$ROOT/install.sh" "$ROOT/bin/check"
+
+if command -v shellcheck >/dev/null 2>&1; then
+  info "running shellcheck"
+  shellcheck "$ROOT/install.sh" "$ROOT/bin/check"
+else
+  warn "shellcheck not found; skipping"
+fi
+
+if command -v zsh >/dev/null 2>&1; then
+  info "checking zsh syntax"
+  zsh -n \
+    "$ROOT/zsh/.zshrc" \
+    "$ROOT/zsh/aliases.zsh" \
+    "$ROOT/zsh/exports.zsh" \
+    "$ROOT/zsh/functions.zsh" \
+    "$ROOT/zsh/local.example.zsh" \
+    "$ROOT/zsh/plugins.zsh" \
+    "$ROOT/zsh/zinit.zsh"
+else
+  warn "zsh not found; skipping zsh syntax checks"
+fi
+
+info "checking git config syntax"
+git config --file "$ROOT/git/gitconfig" --includes --list >/dev/null
+
+info "checking package manifests"
+test -s "$ROOT/packages/macos/Brewfile"
+test -s "$ROOT/packages/ubuntu/apt.txt"
+test -s "$ROOT/packages/go/global.txt"
+test -s "$ROOT/packages/npm/global.txt"
+
+info "ok"
