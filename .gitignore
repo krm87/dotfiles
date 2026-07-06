@@ -1,0 +1,9 @@
+.DS_Store
+
+# Machine-local overrides
+zsh/local.zsh
+git/gitconfig.local
+ssh/config.local
+
+# Installer backups
+*.backup.*

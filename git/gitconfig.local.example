@@ -1,0 +1,8 @@
+# Copy this to ~/.gitconfig.local or create your own local file.
+#
+# [user]
+#     name = Your Name
+#     email = you@example.com
+#
+# [commit]
+#     gpgsign = true

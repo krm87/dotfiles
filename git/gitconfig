@@ -18,8 +18,10 @@
     conflictstyle = zdiff3
 
 [core]
-    editor = code --wait
     excludesfile = ~/.gitignore_global
+
+[include]
+    path = ~/.gitconfig.local
 
 [filter "lfs"]
     required = true
