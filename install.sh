@@ -58,7 +58,8 @@ install_ubuntu() {
       eza \
       shellcheck \
       unzip \
-      ca-certificates
+      ca-certificates \
+      bubblewrap
   else
     warn "Unsupported Linux package manager. Install dependencies manually."
   fi

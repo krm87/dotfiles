@@ -1,0 +1,28 @@
+[user]
+    name = Karim Elmirou
+    email = k@elmirou.com
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = false
+
+[fetch]
+    prune = true
+
+[rerere]
+    enabled = true
+
+[merge]
+    conflictstyle = zdiff3
+
+[core]
+    editor = code --wait
+    excludesfile = ~/.gitignore_global
+
+[filter "lfs"]
+    required = true
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
