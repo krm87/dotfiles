@@ -1,0 +1,81 @@
+Host *
+    IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+
+Host pve
+    HostName pve
+    User root
+    ForwardAgent yes
+
+Host ubuntu-dev
+    HostName ubuntu-dev
+    User karim
+    ForwardAgent yes
+
+Host spreekkamer-export
+    Hostname 91.99.229.236
+    IdentityFile ~/.ssh/mckarim-ed.pub
+    IdentitiesOnly yes
+
+Host spreekkamer-build
+    Hostname 46.225.84.121
+    IdentityFile ~/.ssh/mckarim-ed.pub
+    IdentitiesOnly yes
+
+Host spreekkamer-waf
+    Hostname 46.224.231.218
+    IdentityFile ~/.ssh/mckarim-ed.pub
+    IdentitiesOnly yes
+
+Host spreekkamer-dev
+    Hostname 91.98.170.122
+    IdentityFile ~/.ssh/mckarim-ed.pub
+    IdentitiesOnly yes
+
+Host spreekkamer-acc
+    Hostname 168.119.121.157
+    IdentityFile ~/.ssh/mckarim-ed.pub
+    IdentitiesOnly yes
+
+Host spreekkamer-prod
+    Hostname 49.13.167.135
+    IdentityFile ~/.ssh/mckarim-ed.pub
+    IdentitiesOnly yes
+
+Host fwd-spreekkamer-dev
+    Hostname 91.98.170.122
+    User karim
+    IdentityFile ~/.ssh/mckarim-ed.pub
+    IdentitiesOnly yes
+    LocalForward 3307 localhost:3306
+
+Host controller.home.lan
+    HostName controller.home.lan
+    User karim
+    ForwardAgent yes
+    IdentityFile ~/.ssh/karim-rsa.pub
+    IdentitiesOnly yes
+
+Host worker
+    HostName worker.home.lan
+    User karim
+    ForwardAgent yes
+    IdentityFile ~/.ssh/karim-ed.pub
+    IdentitiesOnly yes
+
+Host github_personal
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/karim-ed.pub
+    IdentitiesOnly yes
+
+Host github_mc
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/mckarim-ed.pub
+    IdentitiesOnly yes
+
+Host devops_mc
+    HostName ssh.dev.azure.com
+    User git
+    IdentityFile ~/.ssh/mckarim-rsa.pub
+    IdentitiesOnly yes

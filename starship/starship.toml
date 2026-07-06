@@ -1,0 +1,77 @@
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$golang\
+$dotnet\
+$docker_context\
+$kubernetes\
+$cmd_duration\
+$line_break\
+$character"""
+
+add_newline = true
+
+[username]
+show_always = true
+format = "[$user]($style) "
+style_user = "bold green"
+
+[hostname]
+ssh_only = false
+format = "in [$hostname](bold blue) "
+
+[directory]
+truncation_length = 4
+truncate_to_repo = false
+format = "in [$path]($style) "
+style = "bold cyan"
+
+[git_branch]
+format = "on [$symbol$branch]($style) "
+symbol = " "
+style = "bold purple"
+
+[git_status]
+format = "[$all_status$ahead_behind]($style) "
+style = "bold yellow"
+conflicted = "=${count} "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇕⇡${ahead_count}⇣${behind_count} "
+untracked = "?${count} "
+stashed = "$${count} "
+modified = "!${count} "
+staged = "+${count} "
+renamed = "»${count} "
+deleted = "✘${count} "
+
+[nodejs]
+format = "via [node $version](bold green) "
+detect_files = ["package.json", ".nvmrc"]
+
+[golang]
+format = "via [go $version](bold cyan) "
+
+[dotnet]
+format = "via [.NET $version](bold purple) "
+
+[docker_context]
+format = "via [docker $context](blue) "
+only_with_files = true
+
+[kubernetes]
+disabled = false
+format = "on [k8s $context/$namespace](bold blue) "
+
+[cmd_duration]
+min_time = 2000
+format = "took [$duration](bold yellow) "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold yellow)"
