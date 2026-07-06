@@ -73,6 +73,10 @@ install_ubuntu() {
     info "Installing Atuin"
     curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
   fi
+  echo "kernel.apparmor_restrict_unprivileged_userns=0" | \
+  sudo tee /etc/sysctl.d/99-codex-sandbox.conf
+
+  sudo sysctl --system
 }
 
 install_nvm() {
