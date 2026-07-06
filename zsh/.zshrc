@@ -1,34 +1,28 @@
-# Dotfiles root
+export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+
 if [[ -d "$HOME/workspace/personal/dotfiles" ]]; then
   export DOTFILES="$HOME/workspace/personal/dotfiles"
-else
-  export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 fi
 
-# Base environment
 source "$DOTFILES/zsh/exports.zsh"
-
-# Plugin manager
 source "$DOTFILES/zsh/zinit.zsh"
-
-# Plugins
 source "$DOTFILES/zsh/plugins.zsh"
 
-# Prompt
-eval "$(starship init zsh)"
+command -v starship >/dev/null && eval "$(starship init zsh)"
 
-# Shell config
 source "$DOTFILES/zsh/aliases.zsh"
 source "$DOTFILES/zsh/functions.zsh"
 
-# Tool integrations
 command -v direnv >/dev/null && eval "$(direnv hook zsh)"
 command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
-if [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
-  source /usr/share/doc/fzf/examples/key-bindings.zsh
+
+if [[ -f "$HOME/.fzf.zsh" ]]; then
+  source "$HOME/.fzf.zsh"
+elif command -v fzf >/dev/null && fzf --zsh >/dev/null 2>&1; then
+  source <(fzf --zsh)
+else
+  [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+  [[ -f /usr/share/doc/fzf/examples/completion.zsh ]] && source /usr/share/doc/fzf/examples/completion.zsh
 fi
 
-if [ -f /usr/share/doc/fzf/examples/completion.zsh ]; then
-  source /usr/share/doc/fzf/examples/completion.zsh
-fi
 command -v atuin >/dev/null && eval "$(atuin init zsh)"
