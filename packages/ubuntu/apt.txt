@@ -1,0 +1,24 @@
+# Core shell / dotfiles
+zsh
+git
+git-lfs
+curl
+fzf
+direnv
+zoxide
+ripgrep
+fd-find
+bat
+eza
+tmux
+shellcheck
+unzip
+ca-certificates
+jq
+yq
+
+# Dev essentials
+golang-go
+
+# Sandbox support
+bubblewrap

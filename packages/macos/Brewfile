@@ -9,18 +9,19 @@ brew "eza"
 brew "fd"
 brew "fzf"
 brew "git"
+brew "git-lfs"
+brew "jq"
 brew "ripgrep"
+brew "shellcheck"
 brew "starship"
-brew "zinit"
-brew "zoxide"
+brew "tmux"
 brew "yq"
+brew "zoxide"
 
 # Dev essentials
 brew "gh"
 brew "go"
-brew "nvm"
 brew "uv"
-brew "shellcheck"
 
 # Infra / cloud
 brew "ansible"
@@ -43,7 +44,3 @@ cask "claude"
 cask "1password-cli"
 cask "dotnet-sdk"
 cask "ghostty"
-
-# Language/package-managed tools
-go "golang.org/x/tools/gopls"
-npm "@anthropic-ai/claude-code"
