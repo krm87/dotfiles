@@ -6,6 +6,10 @@ fi
 
 source "$DOTFILES/zsh/exports.zsh"
 source "$DOTFILES/zsh/zinit.zsh"
+
+# Zsh completion system
+autoload -Uz compinit
+compinit
 source "$DOTFILES/zsh/plugins.zsh"
 
 command -v starship >/dev/null && eval "$(starship init zsh)"
@@ -26,5 +30,3 @@ else
 fi
 
 command -v atuin >/dev/null && eval "$(atuin init zsh)"
-
-. "$HOME/.atuin/bin/env"
