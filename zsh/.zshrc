@@ -26,3 +26,5 @@ else
 fi
 
 command -v atuin >/dev/null && eval "$(atuin init zsh)"
+
+. "$HOME/.atuin/bin/env"

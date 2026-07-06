@@ -1,4 +1,3 @@
-cat > install.sh <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -106,6 +105,9 @@ setup_symlinks() {
     chmod 600 "$HOME/.ssh/config"
     info "Created ~/.ssh/config from example"
   fi
+  if [ -f "$DOTFILES_DIR/tmux/tmux.conf" ]; then
+    link_file "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
+  fi
 }
 
 setup_shell() {
@@ -144,4 +146,3 @@ main() {
 }
 
 main "$@"
-EOF
