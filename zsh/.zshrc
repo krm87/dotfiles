@@ -1,5 +1,9 @@
 # Dotfiles root
-export DOTFILES="$HOME/workspace/personal/dotfiles"
+if [[ -d "$HOME/workspace/personal/dotfiles" ]]; then
+  export DOTFILES="$HOME/workspace/personal/dotfiles"
+else
+  export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+fi
 
 # Base environment
 source "$DOTFILES/zsh/exports.zsh"
