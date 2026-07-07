@@ -17,6 +17,9 @@
 [merge]
     conflictstyle = zdiff3
 
+[log]
+    date = format-local:%d-%m-%Y %H:%M:%S %z
+
 [core]
     excludesfile = ~/.gitignore_global
 
