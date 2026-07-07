@@ -12,11 +12,11 @@ warn() {
 }
 
 info "checking bash syntax"
-bash -n "$ROOT/install.sh" "$ROOT/bin/check"
+bash -n "$ROOT/install.sh" "$ROOT/bin/check" "$ROOT/bin/doctor"
 
 if command -v shellcheck >/dev/null 2>&1; then
   info "running shellcheck"
-  shellcheck "$ROOT/install.sh" "$ROOT/bin/check"
+  shellcheck "$ROOT/install.sh" "$ROOT/bin/check" "$ROOT/bin/doctor"
 else
   warn "shellcheck not found; skipping"
 fi
@@ -58,5 +58,6 @@ test -s "$ROOT/packages/ubuntu/apt.txt"
 test -s "$ROOT/packages/go/global.txt"
 test -s "$ROOT/packages/npm/global.txt"
 test -s "$ROOT/packages/npm/allow-scripts.txt"
+test -x "$ROOT/bin/doctor"
 
 info "ok"

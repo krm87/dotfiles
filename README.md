@@ -81,6 +81,20 @@ or:
 
 The check script runs Bash syntax checks, ShellCheck when available, Zsh syntax checks, Git config parsing, AppArmor template parsing when available, and package manifest presence checks.
 
+Run a read-only machine health check with:
+
+```sh
+make doctor
+```
+
+or:
+
+```sh
+./bin/doctor
+```
+
+The doctor reports tool versions, PATH ordering, managed symlinks, package manager availability, Go and Atuin setup, SSH agent status, tmux shell behavior, AppArmor status on Linux, and local override file presence.
+
 ## Growth Notes
 
 This repo currently uses a small custom installer. If host-specific templates, secrets, or many machine profiles become hard to manage, `chezmoi` would be the next reasonable tool to evaluate.
