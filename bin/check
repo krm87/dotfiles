@@ -39,6 +39,39 @@ fi
 info "checking git config syntax"
 git config --file "$ROOT/git/gitconfig" --includes --list >/dev/null
 
+if command -v starship >/dev/null 2>&1; then
+  info "checking Starship config"
+  starship_tmp="$(mktemp -d)"
+  starship_output=""
+  starship_status=0
+
+  git -C "$starship_tmp" init -q
+  git -C "$starship_tmp" config user.email "dotfiles-check@example.invalid"
+  git -C "$starship_tmp" config user.name "Dotfiles Check"
+  printf "tracked\n" >"$starship_tmp/tracked.txt"
+  git -C "$starship_tmp" add tracked.txt
+  git -C "$starship_tmp" commit -qm "Initial commit"
+  printf "stashed\n" >"$starship_tmp/tracked.txt"
+  git -C "$starship_tmp" stash push -qm "dotfiles check"
+
+  starship_output="$(
+    env \
+      TERM=xterm-256color \
+      XDG_CACHE_HOME="$starship_tmp/cache" \
+      STARSHIP_CACHE="$starship_tmp/cache" \
+      STARSHIP_CONFIG="$ROOT/starship/starship.toml" \
+      starship prompt --path "$starship_tmp" 2>&1 >/dev/null
+  )" || starship_status=$?
+  rm -rf "$starship_tmp"
+
+  if [ "$starship_status" -ne 0 ] || [ -n "$starship_output" ]; then
+    printf "%s\n" "$starship_output" >&2
+    exit 1
+  fi
+else
+  warn "starship not found; skipping Starship config check"
+fi
+
 ghostty_bin=""
 if command -v ghostty >/dev/null 2>&1; then
   ghostty_bin="$(command -v ghostty)"
@@ -48,7 +81,16 @@ fi
 
 if [ -n "$ghostty_bin" ]; then
   info "checking Ghostty config syntax"
-  if ! ghostty_output="$("$ghostty_bin" +validate-config --config-file="$ROOT/ghostty/config" 2>&1)"; then
+  ghostty_status=0
+  ghostty_output="$("$ghostty_bin" +validate-config --config-file="$ROOT/ghostty/config" 2>&1)" || ghostty_status=$?
+  if [ "$ghostty_status" -ne 0 ]; then
+    if printf "%s\n" "$ghostty_output" | grep -Fxq "error: SentryInitFailed"; then
+      warn "Ghostty Sentry initialization is blocked; skipping Ghostty config check"
+    else
+      printf "%s\n" "$ghostty_output" >&2
+      exit 1
+    fi
+  elif [ -n "$ghostty_output" ] && ! printf "%s\n" "$ghostty_output" | grep -Fxq "error: SentryInitFailed"; then
     printf "%s\n" "$ghostty_output" >&2
     exit 1
   fi
@@ -100,6 +142,7 @@ fi
 info "checking package manifests"
 test -s "$ROOT/apparmor/codex.template"
 test -s "$ROOT/ghostty/config"
+test -s "$ROOT/starship/starship.toml"
 test -s "$ROOT/packages/macos/Brewfile"
 test -s "$ROOT/packages/ubuntu/apt.txt"
 test -s "$ROOT/packages/go/global.txt"
