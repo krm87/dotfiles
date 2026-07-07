@@ -150,6 +150,137 @@ install_apt_packages() {
   run sudo apt-get install -y "${packages[@]}"
 }
 
+go_linux_arch() {
+  case "$(uname -m)" in
+    x86_64 | amd64)
+      printf "amd64\n"
+      ;;
+    aarch64 | arm64)
+      printf "arm64\n"
+      ;;
+    armv6l | armv7l)
+      printf "armv6l\n"
+      ;;
+    i386 | i686)
+      printf "386\n"
+      ;;
+    *)
+      warn "Unsupported Go architecture: $(uname -m)"
+      return 1
+      ;;
+  esac
+}
+
+latest_go_download() {
+  local json_file="$1"
+  local go_os="$2"
+  local go_arch="$3"
+
+  python3 - "$json_file" "$go_os" "$go_arch" <<'PY'
+import json
+import sys
+
+json_file, go_os, go_arch = sys.argv[1:]
+
+with open(json_file, encoding="utf-8") as fh:
+    releases = json.load(fh)
+
+for release in releases:
+    if not release.get("stable"):
+        continue
+
+    version = release["version"]
+    filename = f"{version}.{go_os}-{go_arch}.tar.gz"
+
+    for candidate in release.get("files", []):
+        if candidate.get("filename") == filename:
+            print(version)
+            print(filename)
+            print(candidate["sha256"])
+            raise SystemExit(0)
+
+raise SystemExit(f"no Go download found for {go_os}-{go_arch}")
+PY
+}
+
+install_go_linux() {
+  local install_prefix="${GO_INSTALL_PREFIX:-/usr/local}"
+  local goroot="$install_prefix/go"
+  local go_arch
+  local json_file
+  local archive
+  local metadata=()
+  local version
+  local filename
+  local sha256
+  local current_version
+  local tmp_dir
+
+  if [ "$OS" != "Linux" ]; then
+    return 0
+  fi
+
+  go_arch="$(go_linux_arch)"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install latest stable Go from go.dev to $goroot for linux-$go_arch"
+    export PATH="$goroot/bin:$PATH"
+    return 0
+  fi
+
+  for dependency in curl python3 tar sha256sum; do
+    if ! command -v "$dependency" >/dev/null 2>&1; then
+      warn "$dependency not found. Install dependencies before installing Go."
+      return 1
+    fi
+  done
+
+  case "$install_prefix" in
+    "" | /)
+      warn "Refusing to install Go with unsafe GO_INSTALL_PREFIX=$install_prefix"
+      return 1
+      ;;
+  esac
+
+  tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$tmp_dir"; trap - RETURN' RETURN
+  json_file="$tmp_dir/go-downloads.json"
+
+  info "Fetching latest Go release metadata"
+  curl -fsSL "https://go.dev/dl/?mode=json" -o "$json_file"
+
+  mapfile -t metadata < <(latest_go_download "$json_file" "linux" "$go_arch")
+  if [ "${#metadata[@]}" -ne 3 ]; then
+    warn "Could not determine latest Go download for linux-$go_arch"
+    return 1
+  fi
+
+  version="${metadata[0]}"
+  filename="${metadata[1]}"
+  sha256="${metadata[2]}"
+  archive="$tmp_dir/$filename"
+
+  current_version="$(go version 2>/dev/null | awk '{print $3}' || true)"
+  if [ "$current_version" = "$version" ]; then
+    info "Go $version already installed"
+    export PATH="$goroot/bin:$PATH"
+    return 0
+  fi
+
+  info "Downloading $filename"
+  curl -fsSL "https://go.dev/dl/$filename" -o "$archive"
+
+  info "Verifying $filename"
+  printf "%s  %s\n" "$sha256" "$archive" | sha256sum -c -
+
+  info "Installing Go $version to $goroot"
+  sudo rm -rf "$goroot"
+  sudo tar -C "$install_prefix" -xzf "$archive"
+
+  export PATH="$goroot/bin:$PATH"
+  info "Installed $(go version)"
+}
+
 install_starship() {
   if command -v starship >/dev/null 2>&1; then
     info "Starship already installed"
@@ -259,6 +390,7 @@ install_ubuntu() {
 
   install_starship
   install_atuin
+  install_go_linux
 }
 
 install_nvm() {
@@ -284,7 +416,7 @@ install_go_tools() {
 
   [ -f "$tools_file" ] || return 0
 
-  if ! command -v go >/dev/null 2>&1; then
+  if ! command -v go >/dev/null 2>&1 && [ "$DRY_RUN" -ne 1 ]; then
     warn "Go not found. Skipping Go tools from $tools_file"
     return 0
   fi

@@ -33,12 +33,14 @@ The installer backs up existing files before replacing them with symlinks.
 ## Package Layout
 
 - `packages/macos/Brewfile`: Homebrew formulae and casks for macOS Apple Silicon.
-- `packages/ubuntu/apt.txt`: apt packages for Ubuntu-style Linux.
+- `packages/ubuntu/apt.txt`: apt packages for Ubuntu-style Linux. Go is intentionally not installed from apt.
 - `packages/go/global.txt`: Go tools installed with `go install`.
 - `packages/npm/global.txt`: npm tools installed with `npm install -g` when npm is available.
 - `apparmor/codex.template`: AppArmor profile template used by `--enable-codex-sandbox`.
 
 The Ubuntu package list assumes your configured apt sources provide the listed packages. Add distro-specific setup scripts later if a package needs an external repository.
+
+On Linux, the installer fetches the latest stable Go release metadata from `go.dev`, downloads the matching tarball, verifies its SHA-256 checksum, and installs it to `/usr/local/go`.
 
 ## Local Overrides
 

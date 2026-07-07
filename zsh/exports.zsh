@@ -33,6 +33,8 @@ Linux)
     if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
       eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
     fi
+
+    [[ -d /usr/local/go/bin ]] && path=(/usr/local/go/bin $path)
 ;;
 esac
 
