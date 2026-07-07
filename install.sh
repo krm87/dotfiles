@@ -485,8 +485,16 @@ install_go_tools() {
   done <"$tools_file"
 }
 
+npm_supports_allow_scripts() {
+  npm config ls -l 2>/dev/null |
+    grep -E '^[;[:space:]]*allow-scripts =' >/dev/null
+}
+
 install_npm_tools() {
   local tools_file="$DOTFILES_DIR/packages/npm/global.txt"
+  local allow_scripts_file="$DOTFILES_DIR/packages/npm/allow-scripts.txt"
+  local npm_install_args=(install -g)
+  local allowed_script
   local tool
 
   [ -f "$tools_file" ] || return 0
@@ -496,13 +504,19 @@ install_npm_tools() {
     return 0
   fi
 
+  if [ -f "$allow_scripts_file" ] && npm_supports_allow_scripts; then
+    while IFS= read -r allowed_script; do
+      npm_install_args+=(--allow-scripts="$allowed_script")
+    done < <(read_package_file "$allow_scripts_file")
+  fi
+
   while IFS= read -r tool || [ -n "$tool" ]; do
     case "$tool" in
       "" | \#*)
         continue
         ;;
       *)
-        run npm install -g "$tool"
+        run npm "${npm_install_args[@]}" "$tool"
         ;;
     esac
   done <"$tools_file"

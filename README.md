@@ -36,6 +36,7 @@ The installer backs up existing files before replacing them with symlinks.
 - `packages/ubuntu/apt.txt`: apt packages for Ubuntu-style Linux. Go is intentionally not installed from apt.
 - `packages/go/global.txt`: Go tools installed with `go install`.
 - `packages/npm/global.txt`: npm tools installed with `npm install -g` when npm is available.
+- `packages/npm/allow-scripts.txt`: npm global packages whose install scripts are approved via `--allow-scripts`.
 - `apparmor/codex.template`: AppArmor profile template used by `--enable-codex-sandbox`.
 
 The Ubuntu package list assumes your configured apt sources provide the listed packages. Add distro-specific setup scripts later if a package needs an external repository.
@@ -43,6 +44,8 @@ The Ubuntu package list assumes your configured apt sources provide the listed p
 On Linux, the installer fetches the latest stable Go release metadata from `go.dev`, downloads the matching tarball, verifies its SHA-256 checksum, and installs it to `/usr/local/go`.
 
 Atuin is installed under `~/.atuin/bin` on Linux. The dotfiles add that directory to PATH directly and remove Atuin installer profile hooks so generated lines do not get written into the tracked `.zshrc` symlink.
+
+Claude Code has an npm `postinstall` script, so it is listed in `packages/npm/allow-scripts.txt`. This keeps npm 11+ global installs quiet without allowing install scripts for every npm package.
 
 ## Local Overrides
 

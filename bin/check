@@ -57,5 +57,6 @@ test -s "$ROOT/packages/macos/Brewfile"
 test -s "$ROOT/packages/ubuntu/apt.txt"
 test -s "$ROOT/packages/go/global.txt"
 test -s "$ROOT/packages/npm/global.txt"
+test -s "$ROOT/packages/npm/allow-scripts.txt"
 
 info "ok"
