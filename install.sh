@@ -545,6 +545,10 @@ setup_symlinks() {
     link_file "$DOTFILES_DIR/ghostty/config" "$HOME/.config/ghostty/config"
   fi
 
+  if [ -f "$DOTFILES_DIR/bin/tmux-copy" ]; then
+    link_file "$DOTFILES_DIR/bin/tmux-copy" "$HOME/.local/bin/tmux-copy"
+  fi
+
   if [ -f "$DOTFILES_DIR/git/gitconfig" ]; then
     link_file "$DOTFILES_DIR/git/gitconfig" "$HOME/.gitconfig"
   fi

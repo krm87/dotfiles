@@ -13,10 +13,11 @@ warn() {
 
 info "checking bash syntax"
 bash -n "$ROOT/install.sh" "$ROOT/bin/check" "$ROOT/bin/doctor"
+sh -n "$ROOT/bin/tmux-copy"
 
 if command -v shellcheck >/dev/null 2>&1; then
   info "running shellcheck"
-  shellcheck "$ROOT/install.sh" "$ROOT/bin/check" "$ROOT/bin/doctor"
+  shellcheck "$ROOT/install.sh" "$ROOT/bin/check" "$ROOT/bin/doctor" "$ROOT/bin/tmux-copy"
 else
   warn "shellcheck not found; skipping"
 fi
@@ -55,6 +56,34 @@ else
   warn "ghostty not found; skipping Ghostty config check"
 fi
 
+if command -v tmux >/dev/null 2>&1; then
+  info "checking tmux config syntax"
+  tmux_tmp="$(mktemp -d)"
+  tmux_socket="$tmux_tmp/tmux.sock"
+  tmux_output=""
+  tmux_status=0
+  tmux_output="$(
+    {
+      tmux -S "$tmux_socket" -f "$ROOT/tmux/tmux.conf" new-session -d -s dotfiles-check &&
+        tmux -S "$tmux_socket" source-file -n "$ROOT/tmux/tmux.conf" &&
+        tmux -S "$tmux_socket" kill-server
+    } 2>&1
+  )" || tmux_status=$?
+  tmux -S "$tmux_socket" kill-server >/dev/null 2>&1 || true
+  rm -rf "$tmux_tmp"
+
+  if [ "$tmux_status" -ne 0 ] || [ -n "$tmux_output" ]; then
+    if printf "%s\n" "$tmux_output" | grep -Fq "Operation not permitted"; then
+      warn "tmux socket creation is blocked; skipping tmux config check"
+    else
+      printf "%s\n" "$tmux_output" >&2
+      exit 1
+    fi
+  fi
+else
+  warn "tmux not found; skipping tmux config check"
+fi
+
 if command -v apparmor_parser >/dev/null 2>&1; then
   info "checking AppArmor profile template"
   codex_attachment='@{HOME}/{.local/bin/codex,.codex/packages/standalone/{current,releases/*}/bin/codex}'
@@ -77,5 +106,6 @@ test -s "$ROOT/packages/go/global.txt"
 test -s "$ROOT/packages/npm/global.txt"
 test -s "$ROOT/packages/npm/allow-scripts.txt"
 test -x "$ROOT/bin/doctor"
+test -x "$ROOT/bin/tmux-copy"
 
 info "ok"

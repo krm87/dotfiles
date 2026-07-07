@@ -11,6 +11,8 @@ fd-find
 bat
 eza
 tmux
+wl-clipboard
+xclip
 shellcheck
 unzip
 ca-certificates

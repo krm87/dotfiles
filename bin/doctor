@@ -449,6 +449,7 @@ check_symlinks() {
   check_expected_symlink "zshrc" "$HOME/.zshrc" "$ROOT/zsh/.zshrc"
   check_expected_symlink "starship" "$HOME/.config/starship.toml" "$ROOT/starship/starship.toml"
   check_optional_symlink "ghostty" "$HOME/.config/ghostty/config" "$ROOT/ghostty/config"
+  check_optional_symlink "tmux-copy" "$HOME/.local/bin/tmux-copy" "$ROOT/bin/tmux-copy"
   check_expected_symlink "gitconfig" "$HOME/.gitconfig" "$ROOT/git/gitconfig"
   check_expected_symlink "gitignore" "$HOME/.gitignore_global" "$ROOT/git/gitignore_global"
   check_expected_symlink "tmux" "$HOME/.tmux.conf" "$ROOT/tmux/tmux.conf"
