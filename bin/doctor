@@ -269,6 +269,28 @@ check_expected_symlink() {
   fi
 }
 
+check_optional_symlink() {
+  local label="$1"
+  local target="$2"
+  local source="$3"
+  local actual
+
+  if [ -L "$target" ]; then
+    actual="$(readlink "$target" || true)"
+    if [ ! -e "$target" ]; then
+      failure "$label" "$target is a broken symlink to $actual"
+    elif [ "$actual" = "$source" ]; then
+      ok "$label" "$target -> $source"
+    else
+      warning "$label" "$target points to $actual, expected $source"
+    fi
+  elif [ -e "$target" ]; then
+    warning "$label" "$target exists but is not a symlink"
+  else
+    warning "$label" "$target is not linked yet"
+  fi
+}
+
 check_file_readable() {
   local label="$1"
   local file="$2"
@@ -426,6 +448,7 @@ check_symlinks() {
 
   check_expected_symlink "zshrc" "$HOME/.zshrc" "$ROOT/zsh/.zshrc"
   check_expected_symlink "starship" "$HOME/.config/starship.toml" "$ROOT/starship/starship.toml"
+  check_optional_symlink "ghostty" "$HOME/.config/ghostty/config" "$ROOT/ghostty/config"
   check_expected_symlink "gitconfig" "$HOME/.gitconfig" "$ROOT/git/gitconfig"
   check_expected_symlink "gitignore" "$HOME/.gitignore_global" "$ROOT/git/gitignore_global"
   check_expected_symlink "tmux" "$HOME/.tmux.conf" "$ROOT/tmux/tmux.conf"

@@ -1,0 +1,33 @@
+# Keep font-family unset so Ghostty picks the best installed monospace font on each OS.
+font-size = 14
+
+theme = light:GitHub Light Default,dark:GitHub Dark Default
+
+shell-integration = detect
+shell-integration-features = cursor,no-sudo,title,no-ssh-env,no-ssh-terminfo,path
+
+cursor-style = block
+cursor-style-blink = false
+cursor-click-to-move = true
+mouse-hide-while-typing = true
+
+window-padding-x = 8
+window-padding-y = 6
+window-padding-balance = true
+window-padding-color = background
+window-save-state = always
+confirm-close-surface = true
+
+copy-on-select = true
+clipboard-read = ask
+clipboard-write = allow
+clipboard-trim-trailing-spaces = true
+clipboard-paste-protection = true
+clipboard-paste-bracketed-safe = true
+
+macos-titlebar-style = transparent
+macos-option-as-alt = left
+
+keybind = super+shift+r=reload_config
+keybind = super+alt+t=toggle_quick_terminal
+keybind = super+alt+shift+t=toggle_tab_overview

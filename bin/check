@@ -38,6 +38,23 @@ fi
 info "checking git config syntax"
 git config --file "$ROOT/git/gitconfig" --includes --list >/dev/null
 
+ghostty_bin=""
+if command -v ghostty >/dev/null 2>&1; then
+  ghostty_bin="$(command -v ghostty)"
+elif [ -x /Applications/Ghostty.app/Contents/MacOS/ghostty ]; then
+  ghostty_bin="/Applications/Ghostty.app/Contents/MacOS/ghostty"
+fi
+
+if [ -n "$ghostty_bin" ]; then
+  info "checking Ghostty config syntax"
+  if ! ghostty_output="$("$ghostty_bin" +validate-config --config-file="$ROOT/ghostty/config" 2>&1)"; then
+    printf "%s\n" "$ghostty_output" >&2
+    exit 1
+  fi
+else
+  warn "ghostty not found; skipping Ghostty config check"
+fi
+
 if command -v apparmor_parser >/dev/null 2>&1; then
   info "checking AppArmor profile template"
   codex_attachment='@{HOME}/{.local/bin/codex,.codex/packages/standalone/{current,releases/*}/bin/codex}'
@@ -53,6 +70,7 @@ fi
 
 info "checking package manifests"
 test -s "$ROOT/apparmor/codex.template"
+test -s "$ROOT/ghostty/config"
 test -s "$ROOT/packages/macos/Brewfile"
 test -s "$ROOT/packages/ubuntu/apt.txt"
 test -s "$ROOT/packages/go/global.txt"

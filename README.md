@@ -47,6 +47,8 @@ Atuin is installed under `~/.atuin/bin` on Linux. The dotfiles add that director
 
 Claude Code has an npm `postinstall` script, so it is listed in `packages/npm/allow-scripts.txt`. This keeps npm 11+ global installs quiet without allowing install scripts for every npm package.
 
+Ghostty is configured by `ghostty/config`, which is linked to `~/.config/ghostty/config`.
+
 ## Local Overrides
 
 Machine-local customizations should live outside the repo:
@@ -79,7 +81,7 @@ or:
 ./bin/check
 ```
 
-The check script runs Bash syntax checks, ShellCheck when available, Zsh syntax checks, Git config parsing, AppArmor template parsing when available, and package manifest presence checks.
+The check script runs Bash syntax checks, ShellCheck when available, Zsh syntax checks, Git config parsing, Ghostty config parsing when available, AppArmor template parsing when available, and package manifest presence checks.
 
 Run a read-only machine health check with:
 

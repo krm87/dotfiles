@@ -89,17 +89,18 @@ link_file() {
     return 1
   fi
 
-  mkdir -p "$(dirname "$target")"
-
   if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then
     info "Already linked $target -> $source"
     return 0
   fi
 
   if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: ensure $(dirname "$target") exists"
     info "DRY RUN: link $target -> $source"
     return 0
   fi
+
+  mkdir -p "$(dirname "$target")"
 
   if [ -L "$target" ]; then
     rm "$target"
@@ -539,6 +540,10 @@ setup_symlinks() {
 
   link_file "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
   link_file "$DOTFILES_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
+
+  if [ -f "$DOTFILES_DIR/ghostty/config" ]; then
+    link_file "$DOTFILES_DIR/ghostty/config" "$HOME/.config/ghostty/config"
+  fi
 
   if [ -f "$DOTFILES_DIR/git/gitconfig" ]; then
     link_file "$DOTFILES_DIR/git/gitconfig" "$HOME/.gitconfig"
