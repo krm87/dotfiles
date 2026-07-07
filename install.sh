@@ -39,6 +39,18 @@ run() {
   "$@"
 }
 
+prepend_path() {
+  local dir="$1"
+
+  case ":$PATH:" in
+    *:"$dir":*)
+      ;;
+    *)
+      export PATH="$dir:$PATH"
+      ;;
+  esac
+}
+
 parse_args() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -297,18 +309,58 @@ install_starship() {
 }
 
 install_atuin() {
-  if command -v atuin >/dev/null 2>&1; then
+  local atuin_bin_dir="$HOME/.atuin/bin"
+  local atuin_bin="$atuin_bin_dir/atuin"
+
+  if command -v atuin >/dev/null 2>&1 || [ -x "$atuin_bin" ]; then
+    prepend_path "$atuin_bin_dir"
     info "Atuin already installed"
+    remove_atuin_profile_hook
     return 0
   fi
 
   info "Installing Atuin"
   if [ "$DRY_RUN" -eq 1 ]; then
     info "DRY RUN: install Atuin from https://setup.atuin.sh"
+    info "DRY RUN: remove Atuin installer PATH hook from shell profiles"
     return 0
   fi
 
-  curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+  curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh |
+    INSTALLER_NO_MODIFY_PATH=1 PROFILE=/dev/null sh
+  prepend_path "$atuin_bin_dir"
+  remove_atuin_profile_hook
+}
+
+remove_atuin_profile_hook() {
+  local hook=". \"\$HOME/.atuin/bin/env\""
+  local source_hook="source \"\$HOME/.atuin/bin/env\""
+  local profile
+  local tmp
+
+  for profile in "$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.profile"; do
+    [ -e "$profile" ] || continue
+
+    if ! grep -Fq "$hook" "$profile" &&
+      ! grep -Fq "$source_hook" "$profile"; then
+      continue
+    fi
+
+    if [ "$DRY_RUN" -eq 1 ]; then
+      info "DRY RUN: remove Atuin installer PATH hook from $profile"
+      continue
+    fi
+
+    tmp="$(mktemp)"
+    awk -v hook="$hook" -v source_hook="$source_hook" '
+      $0 == hook { next }
+      $0 == source_hook { next }
+      { print }
+    ' "$profile" >"$tmp"
+    cat "$tmp" >"$profile"
+    rm -f "$tmp"
+    info "Removed Atuin installer PATH hook from $profile"
+  done
 }
 
 render_codex_apparmor_profile() {

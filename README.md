@@ -42,6 +42,8 @@ The Ubuntu package list assumes your configured apt sources provide the listed p
 
 On Linux, the installer fetches the latest stable Go release metadata from `go.dev`, downloads the matching tarball, verifies its SHA-256 checksum, and installs it to `/usr/local/go`.
 
+Atuin is installed under `~/.atuin/bin` on Linux. The dotfiles add that directory to PATH directly and remove Atuin installer profile hooks so generated lines do not get written into the tracked `.zshrc` symlink.
+
 ## Local Overrides
 
 Machine-local customizations should live outside the repo:

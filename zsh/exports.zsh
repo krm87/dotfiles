@@ -7,6 +7,7 @@ typeset -U path PATH
 path=(
   "$HOME/bin"
   "$HOME/.local/bin"
+  "$HOME/.atuin/bin"
   "$HOME/go/bin"
   "$HOME/.dotnet/tools"
   $path
