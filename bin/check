@@ -38,7 +38,21 @@ fi
 info "checking git config syntax"
 git config --file "$ROOT/git/gitconfig" --includes --list >/dev/null
 
+if command -v apparmor_parser >/dev/null 2>&1; then
+  info "checking AppArmor profile template"
+  codex_attachment='@{HOME}/{.local/bin/codex,.codex/packages/standalone/{current,releases/*}/bin/codex}'
+  tmp_profile="$(mktemp)"
+  while IFS= read -r line || [ -n "$line" ]; do
+    printf "%s\n" "${line/__CODEX_APPARMOR_ATTACHMENT__/$codex_attachment}"
+  done <"$ROOT/apparmor/codex.template" >"$tmp_profile"
+  apparmor_parser -Q -K "$tmp_profile"
+  rm -f "$tmp_profile"
+else
+  warn "apparmor_parser not found; skipping AppArmor template check"
+fi
+
 info "checking package manifests"
+test -s "$ROOT/apparmor/codex.template"
 test -s "$ROOT/packages/macos/Brewfile"
 test -s "$ROOT/packages/ubuntu/apt.txt"
 test -s "$ROOT/packages/go/global.txt"

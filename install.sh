@@ -25,7 +25,7 @@ Options:
   --dry-run                 Print planned actions without changing the system.
   --no-packages             Skip package and language-tool installation.
   --no-symlinks             Skip dotfile symlink creation.
-  --enable-codex-sandbox    Apply the Ubuntu AppArmor setting used by Codex.
+  --enable-codex-sandbox    Install the scoped AppArmor profile used by Codex.
   -h, --help                Show this help.
 USAGE
 }
@@ -180,26 +180,70 @@ install_atuin() {
   curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 }
 
-apply_codex_sandbox_sysctl() {
+render_codex_apparmor_profile() {
+  local attachment="$1"
+  local template="$DOTFILES_DIR/apparmor/codex.template"
+  local line
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    printf "%s\n" "${line/__CODEX_APPARMOR_ATTACHMENT__/$attachment}"
+  done <"$template"
+}
+
+warn_legacy_codex_sysctl() {
+  local legacy_sysctl="/etc/sysctl.d/99-codex-sandbox.conf"
+
+  if [ -f "$legacy_sysctl" ]; then
+    warn "$legacy_sysctl exists from the old installer."
+    warn "Remove it manually if you want to rely only on the scoped AppArmor profile."
+  fi
+}
+
+install_codex_apparmor_profile() {
   if [ "$ENABLE_CODEX_SANDBOX" -ne 1 ]; then
     return 0
   fi
 
   if [ "$OS" != "Linux" ]; then
-    warn "Codex sandbox sysctl only applies on Linux"
+    warn "Codex AppArmor profile only applies on Linux"
     return 0
   fi
 
-  warn "Applying Ubuntu AppArmor setting for Codex sandbox support"
+  if ! command -v apparmor_parser >/dev/null 2>&1; then
+    warn "apparmor_parser not found. Install AppArmor before enabling the Codex sandbox profile."
+    return 1
+  fi
+
+  local attachment="${CODEX_APPARMOR_ATTACHMENT:-}"
+  local profile_target="/etc/apparmor.d/codex"
+  local tmp_profile
+
+  if [ -z "$attachment" ]; then
+    attachment='@{HOME}/{.local/bin/codex,.codex/packages/standalone/{current,releases/*}/bin/codex}'
+  fi
+
+  case "$attachment" in
+    *\"*)
+      warn "CODEX_APPARMOR_ATTACHMENT cannot contain double quotes"
+      return 1
+      ;;
+  esac
+
+  warn "Installing scoped AppArmor profile for Codex sandbox support"
   if [ "$DRY_RUN" -eq 1 ]; then
-    info "DRY RUN: write /etc/sysctl.d/99-codex-sandbox.conf"
-    info "DRY RUN: sudo sysctl --system"
+    info "DRY RUN: render Codex AppArmor attachment: $attachment"
+    info "DRY RUN: install $profile_target"
+    info "DRY RUN: sudo apparmor_parser -r $profile_target"
     return 0
   fi
 
-  printf "%s\n" "kernel.apparmor_restrict_unprivileged_userns=0" |
-    sudo tee /etc/sysctl.d/99-codex-sandbox.conf >/dev/null
-  sudo sysctl --system
+  tmp_profile="$(mktemp)"
+  render_codex_apparmor_profile "$attachment" >"$tmp_profile"
+  sudo install -m 0644 "$tmp_profile" "$profile_target"
+  sudo apparmor_parser -r "$profile_target"
+  rm -f "$tmp_profile"
+
+  warn_legacy_codex_sysctl
 }
 
 install_ubuntu() {
@@ -215,7 +259,6 @@ install_ubuntu() {
 
   install_starship
   install_atuin
-  apply_codex_sandbox_sysctl
 }
 
 install_nvm() {
@@ -365,6 +408,8 @@ main() {
   else
     info "Skipping package installation"
   fi
+
+  install_codex_apparmor_profile
 
   if [ "$SETUP_SYMLINKS" -eq 1 ]; then
     setup_symlinks

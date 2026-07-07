@@ -1,0 +1,11 @@
+# Allow Codex to create unprivileged user namespaces for its sandbox without
+# disabling kernel.apparmor_restrict_unprivileged_userns globally.
+
+abi <abi/4.0>,
+include <tunables/global>
+
+profile codex __CODEX_APPARMOR_ATTACHMENT__ flags=(unconfined) {
+  userns,
+
+  include if exists <local/codex>
+}

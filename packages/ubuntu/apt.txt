@@ -21,4 +21,5 @@ yq
 golang-go
 
 # Sandbox support
+apparmor
 bubblewrap

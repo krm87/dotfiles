@@ -24,7 +24,9 @@ Useful options:
 ./install.sh --enable-codex-sandbox
 ```
 
-`--enable-codex-sandbox` applies the Ubuntu AppArmor sysctl used by Codex. It is intentionally opt-in because it changes a system security setting.
+`--enable-codex-sandbox` installs a scoped AppArmor profile for Codex so it can create unprivileged user namespaces for its sandbox without disabling `kernel.apparmor_restrict_unprivileged_userns` globally. It is intentionally opt-in because it changes system security policy.
+
+If an older version of this installer created `/etc/sysctl.d/99-codex-sandbox.conf`, remove that file after installing the AppArmor profile if you want the scoped policy to be the only sandbox exception.
 
 The installer backs up existing files before replacing them with symlinks.
 
@@ -34,6 +36,7 @@ The installer backs up existing files before replacing them with symlinks.
 - `packages/ubuntu/apt.txt`: apt packages for Ubuntu-style Linux.
 - `packages/go/global.txt`: Go tools installed with `go install`.
 - `packages/npm/global.txt`: npm tools installed with `npm install -g` when npm is available.
+- `apparmor/codex.template`: AppArmor profile template used by `--enable-codex-sandbox`.
 
 The Ubuntu package list assumes your configured apt sources provide the listed packages. Add distro-specific setup scripts later if a package needs an external repository.
 
@@ -69,7 +72,7 @@ or:
 ./bin/check
 ```
 
-The check script runs Bash syntax checks, ShellCheck when available, Zsh syntax checks, Git config parsing, and package manifest presence checks.
+The check script runs Bash syntax checks, ShellCheck when available, Zsh syntax checks, Git config parsing, AppArmor template parsing when available, and package manifest presence checks.
 
 ## Growth Notes
 
