@@ -535,6 +535,33 @@ install_language_tools() {
   install_npm_tools
 }
 
+install_terminfo() {
+  local ghostty_terminfo="$DOTFILES_DIR/terminfo/xterm-ghostty.terminfo"
+  local tic_output
+
+  if [ "$OS" != "Linux" ]; then
+    return 0
+  fi
+
+  [ -f "$ghostty_terminfo" ] || return 0
+
+  if ! command -v tic >/dev/null 2>&1; then
+    warn "tic not found. Install ncurses-bin to install Ghostty terminfo."
+    return 0
+  fi
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install xterm-ghostty terminfo into $HOME/.terminfo"
+    return 0
+  fi
+
+  info "Installing xterm-ghostty terminfo"
+  if ! tic_output="$(tic -x -o "$HOME/.terminfo" "$ghostty_terminfo" 2>&1 >/dev/null)"; then
+    printf "%s\n" "$tic_output" >&2
+    return 1
+  fi
+}
+
 setup_symlinks() {
   info "Creating symlinks"
 
@@ -617,6 +644,7 @@ main() {
   fi
 
   install_codex_apparmor_profile
+  install_terminfo
 
   if [ "$SETUP_SYMLINKS" -eq 1 ]; then
     setup_symlinks

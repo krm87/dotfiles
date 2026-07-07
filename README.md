@@ -51,6 +51,8 @@ Ghostty is configured by `ghostty/config`, which is linked to `~/.config/ghostty
 
 Ghostty SSH integration is enabled for remote terminal compatibility. It can install `xterm-ghostty` terminfo on remote hosts when available and fall back to `xterm-256color` behavior for SSH environment compatibility.
 
+The Linux installer also installs the tracked `terminfo/xterm-ghostty.terminfo` entry into `~/.terminfo`, so Ubuntu hosts understand `TERM=xterm-ghostty` without a manual fallback.
+
 tmux uses `bin/tmux-copy` for cross-platform copy-mode clipboard integration. The helper is linked to `~/.local/bin/tmux-copy`; on Linux it uses `wl-copy`, `xclip`, or `xsel`, and on macOS it uses `pbcopy`.
 
 ## Local Overrides
