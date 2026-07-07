@@ -49,6 +49,8 @@ Claude Code has an npm `postinstall` script, so it is listed in `packages/npm/al
 
 Ghostty is configured by `ghostty/config`, which is linked to `~/.config/ghostty/config`.
 
+Ghostty SSH integration is enabled for remote terminal compatibility. It can install `xterm-ghostty` terminfo on remote hosts when available and fall back to `xterm-256color` behavior for SSH environment compatibility.
+
 tmux uses `bin/tmux-copy` for cross-platform copy-mode clipboard integration. The helper is linked to `~/.local/bin/tmux-copy`; on Linux it uses `wl-copy`, `xclip`, or `xsel`, and on macOS it uses `pbcopy`.
 
 ## Local Overrides

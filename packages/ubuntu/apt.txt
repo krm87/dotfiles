@@ -16,6 +16,8 @@ xclip
 shellcheck
 unzip
 ca-certificates
+ncurses-bin
+ncurses-term
 jq
 yq
 

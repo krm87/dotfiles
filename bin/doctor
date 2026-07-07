@@ -443,6 +443,28 @@ check_path() {
   esac
 }
 
+check_terminal() {
+  section "Terminal"
+
+  if [ -z "${TERM:-}" ]; then
+    warning "TERM" "not set"
+    return 0
+  fi
+
+  note "TERM" "$TERM"
+
+  if ! command -v infocmp >/dev/null 2>&1; then
+    warning "terminfo" "infocmp is missing; install ncurses-bin"
+    return 0
+  fi
+
+  if infocmp "$TERM" >/dev/null 2>&1; then
+    ok "terminfo" "$TERM is installed"
+  else
+    warning "terminfo" "$TERM is missing; install terminfo or use a compatible fallback"
+  fi
+}
+
 check_symlinks() {
   section "Managed Files"
 
@@ -661,6 +683,7 @@ main() {
   check_package_manager
   check_tools
   check_path
+  check_terminal
   check_symlinks
   check_go
   check_atuin

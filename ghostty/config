@@ -4,7 +4,7 @@ font-size = 14
 theme = light:GitHub Light Default,dark:GitHub Dark Default
 
 shell-integration = detect
-shell-integration-features = cursor,no-sudo,title,no-ssh-env,no-ssh-terminfo,path
+shell-integration-features = cursor,no-sudo,title,ssh-env,ssh-terminfo,path
 
 cursor-style = block
 cursor-style-blink = false
