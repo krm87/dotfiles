@@ -1,8 +1,18 @@
 if command -v eza >/dev/null; then
+  alias ls="eza"
   alias ll="eza -lah --git"
   alias la="eza -a"
   alias lt="eza --tree"
 else
+  case "$(uname)" in
+    Linux)
+      alias ls="ls --color=auto"
+      ;;
+    Darwin)
+      alias ls="ls -G"
+      ;;
+  esac
+
   alias ll="ls -lah"
   alias la="ls -A"
   if command -v tree >/dev/null; then
