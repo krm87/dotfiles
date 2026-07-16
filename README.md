@@ -49,7 +49,7 @@ Dagger is installed as a native CLI, but it still needs a Docker-compatible cont
 
 Atuin is installed under `~/.atuin/bin` on Linux. The dotfiles add that directory to PATH directly and remove Atuin installer profile hooks so generated lines do not get written into the tracked `.zshrc` symlink.
 
-Claude Code has an npm `postinstall` script, so it is listed in `packages/npm/allow-scripts.txt`. This keeps npm 11+ global installs quiet without allowing install scripts for every npm package.
+Claude Code and OpenCode have npm `postinstall` scripts, so they are listed in `packages/npm/allow-scripts.txt`. This keeps npm 11+ global installs working without allowing install scripts for every npm package. OpenCode is reinstalled on each bootstrap so a previously blocked postinstall is repaired automatically.
 
 Ghostty is configured by `ghostty/config`, which is linked to `~/.config/ghostty/config`.
 

@@ -165,5 +165,7 @@ grep -Fq 'nvm install --lts' "$ROOT/install.sh"
 grep -Fq "nvm alias default 'lts/*'" "$ROOT/install.sh"
 grep -Fq 'install_ansible_linux' "$ROOT/install.sh"
 grep -Fq 'install_opencode_linux' "$ROOT/install.sh"
+grep -Fq -- '--allow-scripts=opencode-ai' "$ROOT/install.sh"
+grep -Fxq 'opencode-ai' "$ROOT/packages/npm/allow-scripts.txt"
 
 info "ok"

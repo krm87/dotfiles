@@ -626,18 +626,20 @@ install_node() {
 }
 
 install_opencode_linux() {
+  local npm_install_args=(install -g)
+
   if [ "$OS" != "Linux" ]; then
     return 0
   fi
 
   if command -v opencode >/dev/null 2>&1; then
-    info "OpenCode already installed"
-    return 0
+    info "Ensuring OpenCode is installed with its postinstall script enabled"
+  else
+    info "Installing OpenCode"
   fi
 
-  info "Installing OpenCode"
   if [ "$DRY_RUN" -eq 1 ]; then
-    info "DRY RUN: npm install -g opencode-ai"
+    info "DRY RUN: npm install -g --allow-scripts=opencode-ai opencode-ai"
     return 0
   fi
 
@@ -646,7 +648,11 @@ install_opencode_linux() {
     return 1
   fi
 
-  npm install -g opencode-ai
+  if npm_supports_allow_scripts; then
+    npm_install_args+=(--allow-scripts=opencode-ai)
+  fi
+
+  npm "${npm_install_args[@]}" opencode-ai
 }
 
 install_go_tools() {
