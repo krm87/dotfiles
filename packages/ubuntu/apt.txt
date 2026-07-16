@@ -23,6 +23,7 @@ yq
 
 # Dev essentials
 python3
+gnupg
 
 # Sandbox support
 apparmor

@@ -377,27 +377,28 @@ check_tools() {
   check_tool "starship" fail starship
   check_tool "Go" fail go
   check_tool "gopls" warn gopls
-  check_tool "Node" warn node
-  check_tool "npm" warn npm
+  check_tool "Node" fail node
+  check_tool "npm" fail npm
   check_tool "Atuin" warn atuin
   check_tool "Claude Code" warn claude
   check_tool "Codex" warn codex
+  check_tool "uv" warn uv
+  check_tool "Ansible" warn ansible
+  check_tool "Azure CLI" warn az
+  check_tool "Dagger" warn dagger
+  check_tool "Trivy" warn trivy
+  check_tool "dotnet" warn dotnet
+  check_tool "OpenCode" warn opencode
+  check_tool "Container runtime CLI for Dagger" warn docker podman
 
   case "$OS" in
     Darwin)
       check_tool "GitHub CLI" warn gh
-      check_tool "uv" warn uv
-      check_tool "Ansible" warn ansible
-      check_tool "Azure CLI" warn az
-      check_tool "Dagger" warn dagger
       check_tool "Hetzner Cloud CLI" warn hcloud
-      check_tool "Trivy" warn trivy
       check_tool "Graphviz" warn dot
       check_tool "Pandoc" warn pandoc
       check_tool "PlantUML" warn plantuml
       check_tool "1Password CLI" warn op
-      check_tool "dotnet" warn dotnet
-      check_tool "OpenCode" warn opencode
       check_ghostty
       ;;
     Linux)
@@ -510,6 +511,30 @@ check_go() {
   fi
 
   check_path_contains "GOPATH bin" "$HOME/go/bin"
+}
+
+check_node() {
+  local nvm_dir="${NVM_DIR:-$HOME/.nvm}"
+  local default_alias
+
+  section "Node"
+
+  if [ -s "$nvm_dir/nvm.sh" ]; then
+    ok "nvm" "$nvm_dir/nvm.sh"
+  else
+    failure "nvm" "$nvm_dir/nvm.sh is missing"
+  fi
+
+  if [ -r "$nvm_dir/alias/default" ]; then
+    default_alias="$(sed -n '1p' "$nvm_dir/alias/default")"
+    if [ -n "$default_alias" ]; then
+      ok "nvm default" "$default_alias"
+    else
+      warning "nvm default" "$nvm_dir/alias/default is empty"
+    fi
+  else
+    warning "nvm default" "no default Node alias is configured"
+  fi
 }
 
 check_atuin() {
@@ -686,6 +711,7 @@ main() {
   check_terminal
   check_symlinks
   check_go
+  check_node
   check_atuin
   check_ssh_agent
   check_tmux

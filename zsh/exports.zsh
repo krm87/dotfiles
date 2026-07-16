@@ -2,6 +2,7 @@ export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+export DOTNET_ROOT="${DOTNET_ROOT:-$HOME/.dotnet}"
 
 typeset -U path PATH
 path=(
@@ -9,6 +10,7 @@ path=(
   "$HOME/.local/bin"
   "$HOME/.atuin/bin"
   "$HOME/go/bin"
+  "$DOTNET_ROOT"
   "$HOME/.dotnet/tools"
   $path
 )

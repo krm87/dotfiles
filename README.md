@@ -39,9 +39,13 @@ The installer backs up existing files before replacing them with symlinks.
 - `packages/npm/allow-scripts.txt`: npm global packages whose install scripts are approved via `--allow-scripts`.
 - `apparmor/codex.template`: AppArmor profile template used by `--enable-codex-sandbox`.
 
-The Ubuntu package list assumes your configured apt sources provide the listed packages. Add distro-specific setup scripts later if a package needs an external repository.
+The Ubuntu package list contains tools available directly from the configured apt sources. The installer uses official vendor or standalone installers for uv, Azure CLI, Dagger, Trivy, Codex, and the latest LTS .NET SDK. It installs Ansible as an isolated uv tool and installs OpenCode through npm after Node is ready.
 
 On Linux, the installer fetches the latest stable Go release metadata from `go.dev`, downloads the matching tarball, verifies its SHA-256 checksum, and installs it to `/usr/local/go`.
+
+The installer installs NVM without modifying shell profiles, installs the active Node.js LTS release, makes that LTS line the NVM default, and then installs global npm tools. This makes a fresh bootstrap include both Node and npm instead of stopping after NVM itself.
+
+Dagger is installed as a native CLI, but it still needs a Docker-compatible container runtime. Docker is intentionally not installed automatically because daemon setup, package source, privileges, and rootless mode are machine policy choices. The doctor accepts either Docker or Podman and warns when neither is available.
 
 Atuin is installed under `~/.atuin/bin` on Linux. The dotfiles add that directory to PATH directly and remove Atuin installer profile hooks so generated lines do not get written into the tracked `.zshrc` symlink.
 

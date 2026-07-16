@@ -333,6 +333,130 @@ install_atuin() {
   remove_atuin_profile_hook
 }
 
+install_uv_linux() {
+  if command -v uv >/dev/null 2>&1; then
+    info "uv already installed"
+    return 0
+  fi
+
+  info "Installing uv"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install uv from https://astral.sh/uv/install.sh"
+    return 0
+  fi
+
+  curl -LsSf https://astral.sh/uv/install.sh | UV_NO_MODIFY_PATH=1 sh
+  prepend_path "$HOME/.local/bin"
+}
+
+install_ansible_linux() {
+  if command -v ansible >/dev/null 2>&1; then
+    info "Ansible already installed"
+    return 0
+  fi
+
+  info "Installing Ansible with uv"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: uv tool install --with-executables-from ansible-core ansible"
+    return 0
+  fi
+
+  if ! command -v uv >/dev/null 2>&1; then
+    warn "uv not found. Cannot install Ansible."
+    return 1
+  fi
+
+  uv tool install --with-executables-from ansible-core ansible
+}
+
+install_azure_cli_linux() {
+  if command -v az >/dev/null 2>&1; then
+    info "Azure CLI already installed"
+    return 0
+  fi
+
+  info "Installing Azure CLI"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install Azure CLI from https://aka.ms/InstallAzureCLIDeb"
+    return 0
+  fi
+
+  curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+}
+
+install_dagger_linux() {
+  if command -v dagger >/dev/null 2>&1; then
+    info "Dagger already installed"
+    return 0
+  fi
+
+  info "Installing Dagger"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install Dagger into $HOME/.local/bin"
+    return 0
+  fi
+
+  mkdir -p "$HOME/.local/bin"
+  curl -fsSL https://dl.dagger.io/dagger/install.sh |
+    BIN_DIR="$HOME/.local/bin" sh
+  prepend_path "$HOME/.local/bin"
+}
+
+install_trivy_linux() {
+  if command -v trivy >/dev/null 2>&1; then
+    info "Trivy already installed"
+    return 0
+  fi
+
+  info "Installing Trivy"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install Trivy into $HOME/.local/bin"
+    return 0
+  fi
+
+  mkdir -p "$HOME/.local/bin"
+  curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh |
+    sh -s -- -b "$HOME/.local/bin"
+  prepend_path "$HOME/.local/bin"
+}
+
+install_codex_linux() {
+  if command -v codex >/dev/null 2>&1; then
+    info "Codex already installed"
+    return 0
+  fi
+
+  info "Installing Codex"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install Codex from https://chatgpt.com/codex/install.sh"
+    return 0
+  fi
+
+  curl -fsSL https://chatgpt.com/codex/install.sh | sh
+  prepend_path "$HOME/.local/bin"
+}
+
+install_dotnet_linux() {
+  local dotnet_dir="${DOTNET_ROOT:-$HOME/.dotnet}"
+
+  if command -v dotnet >/dev/null 2>&1; then
+    info ".NET SDK already installed"
+    return 0
+  fi
+
+  info "Installing the latest LTS .NET SDK"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install the .NET SDK LTS channel into $dotnet_dir"
+    return 0
+  fi
+
+  mkdir -p "$dotnet_dir"
+  curl -fsSL https://dot.net/v1/dotnet-install.sh |
+    bash -s -- --channel LTS --install-dir "$dotnet_dir"
+  export DOTNET_ROOT="$dotnet_dir"
+  prepend_path "$dotnet_dir"
+}
+
 remove_atuin_profile_hook() {
   local hook=". \"\$HOME/.atuin/bin/env\""
   local source_hook="source \"\$HOME/.atuin/bin/env\""
@@ -444,14 +568,27 @@ install_ubuntu() {
   install_starship
   install_atuin
   install_go_linux
+  install_uv_linux
+  install_ansible_linux
+  install_azure_cli_linux
+  install_dagger_linux
+  install_trivy_linux
+  install_codex_linux
+  install_dotnet_linux
 }
 
 install_nvm() {
   local nvm_dir="${NVM_DIR:-$HOME/.nvm}"
 
-  if [ -d "$nvm_dir" ]; then
+  if [ -s "$nvm_dir/nvm.sh" ]; then
     info "nvm already installed"
     return 0
+  fi
+
+  if [ -d "$nvm_dir" ] && [ "$DRY_RUN" -ne 1 ]; then
+    warn "nvm directory exists but $nvm_dir/nvm.sh is missing"
+    warn "Repair or remove the incomplete nvm installation, then rerun the installer."
+    return 1
   fi
 
   info "Installing nvm"
@@ -460,7 +597,56 @@ install_nvm() {
     return 0
   fi
 
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh |
+    PROFILE=/dev/null bash
+}
+
+install_node() {
+  local nvm_dir="${NVM_DIR:-$HOME/.nvm}"
+
+  info "Installing or updating the active Node.js LTS release"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: source $nvm_dir/nvm.sh"
+    info "DRY RUN: nvm install --lts"
+    info "DRY RUN: nvm alias default lts/*"
+    info "DRY RUN: nvm use default"
+    return 0
+  fi
+
+  if [ ! -s "$nvm_dir/nvm.sh" ]; then
+    warn "nvm is unavailable at $nvm_dir/nvm.sh"
+    return 1
+  fi
+
+  # shellcheck source=/dev/null
+  . "$nvm_dir/nvm.sh"
+  nvm install --lts
+  nvm alias default 'lts/*'
+  nvm use default
+}
+
+install_opencode_linux() {
+  if [ "$OS" != "Linux" ]; then
+    return 0
+  fi
+
+  if command -v opencode >/dev/null 2>&1; then
+    info "OpenCode already installed"
+    return 0
+  fi
+
+  info "Installing OpenCode"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: npm install -g opencode-ai"
+    return 0
+  fi
+
+  if ! command -v npm >/dev/null 2>&1; then
+    warn "npm not found. Cannot install OpenCode."
+    return 1
+  fi
+
+  npm install -g opencode-ai
 }
 
 install_go_tools() {
@@ -500,7 +686,7 @@ install_npm_tools() {
 
   [ -f "$tools_file" ] || return 0
 
-  if ! command -v npm >/dev/null 2>&1; then
+  if ! command -v npm >/dev/null 2>&1 && [ "$DRY_RUN" -ne 1 ]; then
     warn "npm not found. Install Node with nvm, then rerun to install npm tools."
     return 0
   fi
@@ -622,6 +808,7 @@ main() {
   parse_args "$@"
 
   info "Using dotfiles directory: $DOTFILES_DIR"
+  prepend_path "$HOME/.local/bin"
 
   if [ "$INSTALL_PACKAGES" -eq 1 ]; then
     case "$OS" in
@@ -638,6 +825,8 @@ main() {
     esac
 
     install_nvm
+    install_node
+    install_opencode_linux
     install_language_tools
   else
     info "Skipping package installation"
