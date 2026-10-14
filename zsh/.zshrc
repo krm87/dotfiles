@@ -52,6 +52,12 @@ fi
 
 command -v atuin >/dev/null && eval "$(atuin init zsh)"
 
+# Atuin prepends its own suggestion strategy, which bypasses the history filter.
+# Keep full history in Ctrl+R, but suggest only short, single-line Zsh entries.
+ZSH_AUTOSUGGEST_STRATEGY=(history)
+ZSH_AUTOSUGGEST_HISTORY_IGNORE=$'*\n*|?(#c201,)'
+
 _dotfiles_local_zsh="$XDG_CONFIG_HOME/dotfiles/local.zsh"
 [[ -r "$_dotfiles_local_zsh" ]] && source "$_dotfiles_local_zsh"
 unset _dotfiles_local_zsh
+

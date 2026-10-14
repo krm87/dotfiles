@@ -22,10 +22,11 @@ else
   fi
 fi
 
+# Follow the terminal palette when Ghostty switches between light and dark mode.
 if command -v bat >/dev/null; then
-  alias cat="bat"
+  alias cat="bat --theme=ansi"
 elif command -v batcat >/dev/null; then
-  alias cat="batcat"
+  alias cat="batcat --theme=ansi"
 fi
 
 if command -v fd >/dev/null; then

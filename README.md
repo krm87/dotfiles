@@ -53,6 +53,8 @@ Claude Code and OpenCode have npm `postinstall` scripts, so they are listed in `
 
 Ghostty is configured by `ghostty/config`, which is linked to `~/.config/ghostty/config`.
 
+The Zsh `cat` alias uses `bat` (or `batcat` on Ubuntu) with the `ansi` theme so its colors follow the terminal palette when Ghostty switches between light and dark mode. Use `command cat` for plain file output.
+
 Ghostty SSH integration is enabled for remote terminal compatibility. It can install `xterm-ghostty` terminfo on remote hosts when available and fall back to `xterm-256color` behavior for SSH environment compatibility.
 
 The Linux installer also installs the tracked `terminfo/xterm-ghostty.terminfo` entry into `~/.terminfo`, so Ubuntu hosts understand `TERM=xterm-ghostty` without a manual fallback.
