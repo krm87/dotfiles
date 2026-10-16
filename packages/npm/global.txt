@@ -1,1 +1,4 @@
 @anthropic-ai/claude-code
+# Obsidian Headless Sync for the vaults (life-os obsidian-sync-*.service
+# hard-codes this nvm Node's bin/ob; reinstall it after a Node upgrade)
+obsidian-headless
