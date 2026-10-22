@@ -1,46 +1,87 @@
-tap "anomalyco/tap"
 tap "zzet/tap"
 
 # Core shell / dotfiles
 brew "atuin"
 brew "bat"
 brew "direnv"
+brew "dust"
 brew "eza"
 brew "fd"
 brew "fzf"
 brew "git"
+brew "git-delta"
 brew "git-lfs"
 brew "jq"
 brew "ripgrep"
 brew "shellcheck"
 brew "starship"
 brew "tmux"
+brew "tree"
 brew "yq"
 brew "zoxide"
+
+# Zsh plugins
+brew "zinit"
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+brew "zsh-vi-mode"
+
+# Editor
+brew "luarocks"
+brew "neovim"
+brew "typescript-language-server"
 
 # Dev essentials
 brew "gh"
 brew "go"
+brew "golangci-lint"
+brew "lazydocker"
+brew "lazygit"
+brew "nvm"
 brew "uv"
 
 # Infra / cloud
-brew "ansible"
 brew "azure-cli"
 brew "dagger"
 brew "hcloud"
 brew "trivy"
 
+# Networking
+brew "boring"
+brew "caddy"
+brew "cloudflared"
+brew "dnsmasq"
+brew "rclone"
+
 # Docs / diagrams
 brew "graphviz"
-brew "pandoc"
-brew "plantuml"
+brew "poppler"
+
+# Disk / recovery
+brew "ddrescue"
+brew "e2fsprogs"
 
 # AI / coding tools
-brew "anomalyco/tap/opencode", trusted: true
-cask "codex"
+brew "opencode"
 cask "claude"
+cask "codex"
+cask "t3-code"
+cask "zzet/tap/gortex", trusted: true
 
-# Apps
+# CLI apps
 cask "1password-cli"
 cask "dotnet-sdk"
+
+# Apps
+cask "1password"
+cask "chatgpt"
+cask "combine-pdfs"
+cask "cyberduck"
+cask "docker-desktop"
+cask "drawio"
 cask "ghostty"
+cask "jetbrains-toolbox"
+cask "logi-options+"
+cask "obsidian"
+cask "postman"
+cask "xmind"
