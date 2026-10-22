@@ -1,0 +1,17 @@
+[Unit]
+Description=Load SSH keys from 1Password service accounts into ssh-agent
+Wants=ssh-agent.socket
+After=ssh-agent.socket ssh-agent.service
+# Restarting the agent drops its keys; reload them.
+PartOf=ssh-agent.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=%h/.local/bin/op-ssh-load
+# The network may not be up yet at login.
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=default.target

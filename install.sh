@@ -861,6 +861,13 @@ setup_symlinks() {
     link_file "$DOTFILES_DIR/bin/tmux-copy" "$HOME/.local/bin/tmux-copy"
   fi
 
+  # 1Password service-account SSH keys; enable with
+  # `systemctl --user enable --now op-ssh-load` once ~/.config/op holds tokens.
+  if [ "$OS" = "Linux" ]; then
+    link_file "$DOTFILES_DIR/bin/op-ssh-load" "$HOME/.local/bin/op-ssh-load"
+    link_file "$DOTFILES_DIR/systemd/op-ssh-load.service" "$HOME/.config/systemd/user/op-ssh-load.service"
+  fi
+
   if [ -f "$DOTFILES_DIR/git/gitconfig" ]; then
     link_file "$DOTFILES_DIR/git/gitconfig" "$HOME/.gitconfig"
   fi

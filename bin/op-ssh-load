@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Load SSH keys from 1Password service accounts into the local ssh-agent.
+#
+# Each ~/.config/op/<account>.cred is a service account token encrypted with
+# `systemd-creds --user encrypt --name=op-<account>`. Every SSH Key item in
+# vault "$OP_SSH_VAULT" is added to the agent without touching disk, and its
+# public half is written to ~/.ssh/<vault>-<account>.pub (Ed25519) or
+# ~/.ssh/<vault>-<account>-<type>.pub (other types, e.g. -rsa) so
+# ~/.ssh/config can select it with IdentityFile.
+set -euo pipefail
+umask 077
+
+vault=${OP_SSH_VAULT:-ubuntu-dev}
+export SSH_AUTH_SOCK=${SSH_AUTH_SOCK:-$XDG_RUNTIME_DIR/openssh_agent}
+
+shopt -s nullglob
+creds=("$HOME"/.config/op/*.cred)
+[ ${#creds[@]} -gt 0 ] || { echo "No tokens in ~/.config/op" >&2; exit 1; }
+
+for cred in "${creds[@]}"; do
+  account=$(basename "$cred" .cred)
+  OP_SERVICE_ACCOUNT_TOKEN=$(systemd-creds --user decrypt --name="op-$account" "$cred" -)
+  export OP_SERVICE_ACCOUNT_TOKEN
+  items=$(op item list --vault "$vault" --format json | jq -r '.[] | select(.category == "SSH_KEY") | .id')
+  for id in $items; do
+    public=$(op read "op://$vault/$id/public key")
+    type=${public%% *}
+    case $type in
+      ssh-ed25519) name=$vault-$account ;;
+      ssh-*) name=$vault-$account-${type#ssh-} ;;
+      *) name=$vault-$account-${type%%-*} ;;
+    esac
+    op read "op://$vault/$id/private key?ssh-format=openssh" | ssh-add -q -
+    printf '%s %s\n' "$(cut -d' ' -f1-2 <<<"$public")" "$name" >"$HOME/.ssh/$name.pub"
+    echo "Loaded $name"
+  done
+done
+unset OP_SERVICE_ACCOUNT_TOKEN

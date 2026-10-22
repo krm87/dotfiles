@@ -79,6 +79,15 @@ Examples are provided in:
 
 The SSH example assumes 1Password is the SSH agent on macOS. The `.pub` identity paths are intentional for that setup, and the agent is expected to be forwarded to Ubuntu where needed.
 
+Agents on Ubuntu run without a forwarded agent, so they use keys from 1Password service accounts instead. Each `~/.config/op/<account>.cred` holds a read-only service account token, encrypted for the user:
+
+```sh
+read -rs 'tok?Token: ' && printf %s "$tok" \
+  | systemd-creds --user encrypt --name=op-<account> - ~/.config/op/<account>.cred; unset tok
+```
+
+The `op-ssh-load` user service (`bin/op-ssh-load`, `systemd/op-ssh-load.service`) loads every SSH Key item in each account's `ubuntu-dev` vault into the local ssh-agent at login and after agent restarts, and writes `~/.ssh/ubuntu-dev-<account>.pub` (RSA keys: `ubuntu-dev-<account>-rsa.pub`). List that file as a fallback `IdentityFile` after the 1Password key; which servers accept it is decided by their `authorized_keys`. It needs the 1Password CLI (`1password-cli` from 1Password's APT repository).
+
 ## Checks
 
 Run local checks with:

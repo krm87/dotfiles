@@ -70,12 +70,6 @@ Host github_personal
     IdentityFile ~/.ssh/karim-ed.pub
     IdentitiesOnly yes
 
-Host github_mc
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/mckarim-ed.pub
-    IdentitiesOnly yes
-
 Host devops_mc
     HostName ssh.dev.azure.com
     User git
