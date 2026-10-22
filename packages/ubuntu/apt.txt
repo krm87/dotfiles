@@ -2,6 +2,7 @@
 zsh
 git
 git-lfs
+git-delta
 curl
 fzf
 direnv

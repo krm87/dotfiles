@@ -420,6 +420,95 @@ install_trivy_linux() {
   prepend_path "$HOME/.local/bin"
 }
 
+install_golangci_lint_linux() {
+  if command -v golangci-lint >/dev/null 2>&1; then
+    info "golangci-lint already installed"
+    return 0
+  fi
+
+  info "Installing golangci-lint"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install golangci-lint into $HOME/.local/bin"
+    return 0
+  fi
+
+  mkdir -p "$HOME/.local/bin"
+  curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh |
+    sh -s -- -b "$HOME/.local/bin"
+  prepend_path "$HOME/.local/bin"
+}
+
+install_dust_linux() {
+  local dust_arch
+  local version
+  local asset
+  local tmp_dir
+
+  if command -v dust >/dev/null 2>&1; then
+    info "dust already installed"
+    return 0
+  fi
+
+  case "$(uname -m)" in
+    x86_64 | amd64)
+      dust_arch="x86_64"
+      ;;
+    aarch64 | arm64)
+      dust_arch="aarch64"
+      ;;
+    *)
+      warn "Unsupported dust architecture: $(uname -m)"
+      return 1
+      ;;
+  esac
+
+  info "Installing dust"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install the latest dust release into $HOME/.local/bin"
+    return 0
+  fi
+
+  version="$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/bootandy/dust/releases/latest)"
+  version="${version##*/}"
+  asset="dust-$version-$dust_arch-unknown-linux-gnu"
+
+  tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$tmp_dir"; trap - RETURN' RETURN
+
+  curl -fsSL "https://github.com/bootandy/dust/releases/download/$version/$asset.tar.gz" |
+    tar -xz -C "$tmp_dir"
+  mkdir -p "$HOME/.local/bin"
+  install -m 755 "$tmp_dir/$asset/dust" "$HOME/.local/bin/dust"
+  prepend_path "$HOME/.local/bin"
+}
+
+install_go_tool_linux() {
+  local name="$1"
+  local module="$2"
+
+  if command -v go >/dev/null 2>&1; then
+    prepend_path "$(go env GOPATH)/bin"
+  fi
+
+  if command -v "$name" >/dev/null 2>&1; then
+    info "$name already installed"
+    return 0
+  fi
+
+  info "Installing $name"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: go install $module"
+    return 0
+  fi
+
+  if ! command -v go >/dev/null 2>&1; then
+    warn "Go not found. Cannot install $name."
+    return 1
+  fi
+
+  go install "$module"
+}
+
 install_codex_linux() {
   if command -v codex >/dev/null 2>&1; then
     info "Codex already installed"
@@ -573,6 +662,10 @@ install_ubuntu() {
   install_azure_cli_linux
   install_dagger_linux
   install_trivy_linux
+  install_golangci_lint_linux
+  install_dust_linux
+  install_go_tool_linux lazygit github.com/jesseduffield/lazygit@latest
+  install_go_tool_linux lazydocker github.com/jesseduffield/lazydocker@latest
   install_codex_linux
   install_dotnet_linux
 }

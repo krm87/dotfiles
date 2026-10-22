@@ -117,9 +117,6 @@ tool_version() {
     dagger)
       capture_first_line "$cmd" version || true
       ;;
-    plantuml)
-      capture_first_line "$cmd" -version || true
-      ;;
     ansible)
       ANSIBLE_LOCAL_TEMP="${TMPDIR:-/tmp}/ansible-local" capture_first_line "$cmd" --version || true
       ;;
@@ -362,6 +359,7 @@ check_tools() {
   check_tool "zsh" fail zsh
   check_tool "git" fail git
   check_tool "git-lfs" fail git-lfs
+  check_tool "delta" fail delta
   check_tool "curl" fail curl
   check_tool "fzf" fail fzf
   check_tool "direnv" fail direnv
@@ -387,6 +385,10 @@ check_tools() {
   check_tool "Azure CLI" warn az
   check_tool "Dagger" warn dagger
   check_tool "Trivy" warn trivy
+  check_tool "golangci-lint" warn golangci-lint
+  check_tool "lazygit" warn lazygit
+  check_tool "lazydocker" warn lazydocker
+  check_tool "dust" warn dust
   check_tool "dotnet" warn dotnet
   check_tool "OpenCode" warn opencode
   check_tool "Container runtime CLI for Dagger" warn docker podman
@@ -396,8 +398,6 @@ check_tools() {
       check_tool "GitHub CLI" warn gh
       check_tool "Hetzner Cloud CLI" warn hcloud
       check_tool "Graphviz" warn dot
-      check_tool "Pandoc" warn pandoc
-      check_tool "PlantUML" warn plantuml
       check_tool "1Password CLI" warn op
       check_ghostty
       ;;
