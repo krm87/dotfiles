@@ -369,6 +369,8 @@ check_tools() {
   check_tool "bat" fail bat batcat
   check_tool "eza" fail eza
   check_tool "tmux" fail tmux
+  check_tool "nvim" warn nvim
+  check_tool "tree-sitter" warn tree-sitter
   check_tool "shellcheck" fail shellcheck
   check_tool "jq" fail jq
   check_tool "yq" fail yq
@@ -476,6 +478,8 @@ check_symlinks() {
   check_expected_symlink "gitconfig" "$HOME/.gitconfig" "$ROOT/git/gitconfig"
   check_expected_symlink "gitignore" "$HOME/.gitignore_global" "$ROOT/git/gitignore_global"
   check_expected_symlink "tmux" "$HOME/.tmux.conf" "$ROOT/tmux/tmux.conf"
+  check_expected_symlink "vimrc" "$HOME/.vimrc" "$ROOT/vim/vimrc"
+  check_expected_symlink "nvim" "$HOME/.config/nvim" "$ROOT/nvim"
 
   check_file_readable "ssh config" "$HOME/.ssh/config" warn
   if [ -r "$HOME/.ssh/config" ]; then

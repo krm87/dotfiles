@@ -29,6 +29,7 @@ brew "zsh-vi-mode"
 # Editor
 brew "luarocks"
 brew "neovim"
+brew "tree-sitter-cli"
 brew "typescript-language-server"
 
 # Dev essentials

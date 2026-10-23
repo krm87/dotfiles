@@ -35,6 +35,8 @@ elif command -v fdfind >/dev/null; then
   alias fd="fdfind"
 fi
 
+command -v nvim >/dev/null && alias vim="nvim"
+
 command -v rg >/dev/null && alias grep="rg"
 
 alias ws='cd ~/workspace'

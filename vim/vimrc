@@ -1,0 +1,36 @@
+set nocompatible
+syntax on
+filetype plugin indent on
+
+set number
+
+" Copy every yank to the system clipboard with OSC 52. The terminal does the
+" copying, so this works over SSH and inside tmux (set-clipboard on) without
+" a +clipboard Vim build. Pasting stays inside Vim; use the terminal's paste
+" for clipboard contents.
+function! s:Base64(text) abort
+  if exists('*base64_encode')
+    return base64_encode(str2blob(split(a:text, "\n", 1)))
+  endif
+  return substitute(system('base64 | tr -d "\n"', a:text), '\n', '', 'g')
+endfunction
+
+function! s:OSC52Yank() abort
+  if v:event.operator !=# 'y' || index(['', '+', '*'], v:event.regname) < 0
+    return
+  endif
+  let l:text = join(v:event.regcontents, "\n") . (v:event.regtype ==# 'V' ? "\n" : '')
+  let l:seq = "\e]52;c;" . s:Base64(l:text) . "\x07"
+  if exists('*echoraw')
+    call echoraw(l:seq)
+  else
+    call writefile([l:seq], '/dev/tty', 'b')
+  endif
+endfunction
+
+if exists('##TextYankPost')
+  augroup osc52_yank
+    autocmd!
+    autocmd TextYankPost * call s:OSC52Yank()
+  augroup END
+endif

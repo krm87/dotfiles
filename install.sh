@@ -482,6 +482,81 @@ install_dust_linux() {
   prepend_path "$HOME/.local/bin"
 }
 
+install_neovim_linux() {
+  local nvim_arch
+  local tmp_dir
+
+  # nvim-treesitter needs Neovim 0.12+, newer than Ubuntu's package.
+  if command -v nvim >/dev/null 2>&1 && nvim --headless -c 'if has("nvim-0.12") | qa | else | cq | endif' >/dev/null 2>&1; then
+    info "Neovim already installed"
+    return 0
+  fi
+
+  case "$(uname -m)" in
+    x86_64 | amd64)
+      nvim_arch="x86_64"
+      ;;
+    aarch64 | arm64)
+      nvim_arch="arm64"
+      ;;
+    *)
+      warn "Unsupported Neovim architecture: $(uname -m)"
+      return 1
+      ;;
+  esac
+
+  info "Installing Neovim"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install the latest Neovim release into $HOME/.local/opt/nvim"
+    return 0
+  fi
+
+  tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$tmp_dir"; trap - RETURN' RETURN
+
+  curl -fsSL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$nvim_arch.tar.gz" |
+    tar -xz -C "$tmp_dir"
+  mkdir -p "$HOME/.local/opt" "$HOME/.local/bin"
+  rm -rf "$HOME/.local/opt/nvim"
+  mv "$tmp_dir/nvim-linux-$nvim_arch" "$HOME/.local/opt/nvim"
+  ln -sf "$HOME/.local/opt/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+  prepend_path "$HOME/.local/bin"
+}
+
+install_tree_sitter_linux() {
+  local ts_arch
+
+  if command -v tree-sitter >/dev/null 2>&1; then
+    info "tree-sitter already installed"
+    return 0
+  fi
+
+  case "$(uname -m)" in
+    x86_64 | amd64)
+      ts_arch="x64"
+      ;;
+    aarch64 | arm64)
+      ts_arch="arm64"
+      ;;
+    *)
+      warn "Unsupported tree-sitter architecture: $(uname -m)"
+      return 1
+      ;;
+  esac
+
+  info "Installing tree-sitter"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "DRY RUN: install the latest tree-sitter CLI into $HOME/.local/bin"
+    return 0
+  fi
+
+  mkdir -p "$HOME/.local/bin"
+  curl -fsSL "https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-$ts_arch.gz" |
+    gunzip >"$HOME/.local/bin/tree-sitter"
+  chmod 755 "$HOME/.local/bin/tree-sitter"
+  prepend_path "$HOME/.local/bin"
+}
+
 install_go_tool_linux() {
   local name="$1"
   local module="$2"
@@ -664,6 +739,8 @@ install_ubuntu() {
   install_trivy_linux
   install_golangci_lint_linux
   install_dust_linux
+  install_neovim_linux
+  install_tree_sitter_linux
   install_go_tool_linux lazygit github.com/jesseduffield/lazygit@latest
   install_go_tool_linux lazydocker github.com/jesseduffield/lazydocker@latest
   install_codex_linux
@@ -895,6 +972,14 @@ setup_symlinks() {
 
   if [ -f "$DOTFILES_DIR/tmux/tmux.conf" ]; then
     link_file "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
+  fi
+
+  if [ -f "$DOTFILES_DIR/vim/vimrc" ]; then
+    link_file "$DOTFILES_DIR/vim/vimrc" "$HOME/.vimrc"
+  fi
+
+  if [ -d "$DOTFILES_DIR/nvim" ]; then
+    link_file "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
   fi
 }
 
