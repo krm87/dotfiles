@@ -11,6 +11,8 @@ vim.o.smartcase = true
 vim.pack.add({
   "https://github.com/projekt0n/github-nvim-theme",
   "https://github.com/nvim-treesitter/nvim-treesitter",
+  "https://github.com/nvim-tree/nvim-web-devicons",
+  "https://github.com/MeanderingProgrammer/render-markdown.nvim",
 })
 
 -- Match Ghostty's GitHub Light/Dark themes (see colors/github.lua). Neovim
@@ -51,6 +53,14 @@ vim.api.nvim_create_autocmd("FileType", {
       vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end
   end,
+})
+
+-- Render markdown in the buffer: headings, code blocks, tables, checkboxes.
+-- The cursor line shows the raw text for editing. Icons come from Ghostty's
+-- built-in Nerd Font symbols.
+require("render-markdown").setup({
+  -- Headings already have icons; keep the column left of the numbers empty.
+  sign = { enabled = false },
 })
 
 -- Copy every yank to the system clipboard with OSC 52. The terminal does the

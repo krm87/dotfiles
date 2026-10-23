@@ -66,6 +66,7 @@ Neovim is the editor (`vim` is an alias for `nvim`). The `nvim/` directory is li
 - Line numbers with a `│` separator.
 - The GitHub Light/Dark Default colours that Ghostty uses, following the terminal's light or dark mode (`nvim/colors/github.lua`).
 - Tree-sitter highlighting for TypeScript, C#, Go, Python, shell and more. Parsers are built on first start, so the tree-sitter CLI and a C compiler must be installed.
+- Markdown rendered in the buffer by render-markdown.nvim (headings, code blocks, tables, checkboxes); the cursor line shows the raw text. Its icons need Nerd Font symbols, which Ghostty has built in.
 - Every yank copied to the system clipboard with the OSC 52 escape sequence, so yanking works locally, over SSH and inside tmux. Pasting from the clipboard uses the terminal's paste.
 
 nvim-treesitter needs Neovim 0.12 or newer, which Ubuntu's package does not have yet. On Linux the installer puts the latest Neovim release in `~/.local/opt/nvim` and the tree-sitter CLI in `~/.local/bin`; on macOS both come from Homebrew. Plain Vim (`vim/vimrc`, linked to `~/.vimrc`) gets line numbers and the same yank behaviour.
